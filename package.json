@@ -11,10 +11,7 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [
-    "onCommand:extension.crearEstructuraDenoCompleta",
-    "onCommand:extension.crearEstructuraFeatureDeno"
-  ],
+  "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
@@ -41,7 +38,19 @@
       ]
     }
   },
-  "main": "esbuild.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jiaas/skillmatrix-vscode-extension-api-rest"
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run build",
+    "build": "node esbuild.js",
+    "watch": "node esbuild.js --watch"
+  },
+  "activationEvents": [
+    "onCommand:extension.crearEstructuraDenoCompleta",
+    "onCommand:extension.crearEstructuraFeatureDeno"
+  ],
   "dependencies": {
     "ajv": "^6.12.6",
     "asn1": "^0.2.6",
@@ -131,11 +140,5 @@
     "mocha": "^4.1.0",
     "typescript": "^5.6.3",
     "vscode": "^1.1.37"
-  },
-  "scripts": {
-    "test": "mocha"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+  }
 }
