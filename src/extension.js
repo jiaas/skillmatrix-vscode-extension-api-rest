@@ -1,108 +1,125 @@
-import * as vscode from 'vscode';
-import * as path from 'path';
-import * as fs from 'fs';
-
-export function activate(context: vscode.ExtensionContext) {
-	const createFullStructure = vscode.commands.registerCommand('extension.crearEstructuraDenoCompleta', (uri: vscode.Uri) => {
-		if (uri && uri.fsPath) {
-			const projectPath = uri.fsPath;
-			createDenoFullStructure(projectPath);
-		}
-	});
-
-	const createFeatureStructure = vscode.commands.registerCommand('extension.crearEstructuraFeatureDeno', (uri: vscode.Uri) => {
-		if (uri && uri.fsPath) {
-			const featurePath = uri.fsPath;
-			createDenoFeatureStructure(featurePath);
-		}
-	});
-
-	context.subscriptions.push(createFullStructure);
-	context.subscriptions.push(createFeatureStructure);
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.deactivate = exports.activate = void 0;
+const vscode = __importStar(require("vscode"));
+const path = __importStar(require("path"));
+const fs = __importStar(require("fs"));
+function activate(context) {
+    const createFullStructure = vscode.commands.registerCommand('extension.crearEstructuraDenoCompleta', (uri) => {
+        if (uri && uri.fsPath) {
+            const projectPath = uri.fsPath;
+            createDenoFullStructure(projectPath);
+        }
+    });
+    const createFeatureStructure = vscode.commands.registerCommand('extension.crearEstructuraFeatureDeno', (uri) => {
+        if (uri && uri.fsPath) {
+            const featurePath = uri.fsPath;
+            createDenoFeatureStructure(featurePath);
+        }
+    });
+    context.subscriptions.push(createFullStructure);
+    context.subscriptions.push(createFeatureStructure);
 }
-
-function createDenoFullStructure(projectPath: string) {
-	const structure = {
-		'deps.ts': getDepsFileContent(),
-		'main.ts': getMainFileContent(),
-		'.env': getEnvFileContent(),
-		'deno.json': getDenoConfigContent(),
-		'middlewares': {
-			'error.middleware.ts': getErrorMiddlewareContent(),
-			'auth.middleware.ts': getAuthMiddlewareContent(),
-			'logger.middleware.ts': getLoggerMiddlewareContent()
-		},
-		'settings': {
-			'config.ts': getConfigFileContent(),
-			'database.ts': getDatabaseConfigContent()
-		},
-		'src': {
-			'feature_a': getFeatureStructure('feature_a')
-		}
-	};
-
-	createDirectoriesAndFiles(projectPath, structure);
-	vscode.window.showInformationMessage('Estructura de proyecto Deno/Oak creada con éxito.');
+exports.activate = activate;
+function createDenoFullStructure(projectPath) {
+    const structure = {
+        'deps.ts': getDepsFileContent(),
+        'main.ts': getMainFileContent(),
+        '.env': getEnvFileContent(),
+        'deno.json': getDenoConfigContent(),
+        'middlewares': {
+            'error.middleware.ts': getErrorMiddlewareContent(),
+            'auth.middleware.ts': getAuthMiddlewareContent(),
+            'logger.middleware.ts': getLoggerMiddlewareContent()
+        },
+        'settings': {
+            'config.ts': getConfigFileContent(),
+            'database.ts': getDatabaseConfigContent()
+        },
+        'src': {
+            'feature_a': getFeatureStructure('feature_a')
+        }
+    };
+    createDirectoriesAndFiles(projectPath, structure);
+    vscode.window.showInformationMessage('Estructura de proyecto Deno/Oak creada con éxito.');
 }
-
-function createDenoFeatureStructure(featurePath: string) {
-	let featureName = 'feature_a';
-	let counter = 1;
-
-	while (fs.existsSync(path.join(featurePath, featureName))) {
-		if (counter < 26) {
-			featureName = `feature_${String.fromCharCode(97 + counter)}`;
-		} else {
-			featureName = `feature_${counter - 25}`;
-		}
-		counter++;
-	}
-
-	const structure = getFeatureStructure(featureName);
-	createDirectoriesAndFiles(featurePath, structure);
-	vscode.window.showInformationMessage(`Feature '${featureName}' creado con éxito.`);
+function createDenoFeatureStructure(featurePath) {
+    let featureName = 'feature_a';
+    let counter = 1;
+    while (fs.existsSync(path.join(featurePath, featureName))) {
+        if (counter < 26) {
+            featureName = `feature_${String.fromCharCode(97 + counter)}`;
+        }
+        else {
+            featureName = `feature_${counter - 25}`;
+        }
+        counter++;
+    }
+    const structure = getFeatureStructure(featureName);
+    createDirectoriesAndFiles(featurePath, structure);
+    vscode.window.showInformationMessage(`Feature '${featureName}' creado con éxito.`);
 }
-
-function createDirectoriesAndFiles(basePath: string, structure: any) {
-	for (const name in structure) {
-		const value = structure[name];
-		const newPath = path.join(basePath, name);
-
-		if (typeof value === 'object') {
-			if (!fs.existsSync(newPath)) {
-				fs.mkdirSync(newPath);
-			}
-			createDirectoriesAndFiles(newPath, value);
-		} else {
-			fs.writeFileSync(newPath, value);
-		}
-	}
+function createDirectoriesAndFiles(basePath, structure) {
+    for (const name in structure) {
+        const value = structure[name];
+        const newPath = path.join(basePath, name);
+        if (typeof value === 'object') {
+            if (!fs.existsSync(newPath)) {
+                fs.mkdirSync(newPath);
+            }
+            createDirectoriesAndFiles(newPath, value);
+        }
+        else {
+            fs.writeFileSync(newPath, value);
+        }
+    }
 }
-
-function getFeatureStructure(featureName: string) {
-	const templates = getFeatureTemplates(featureName);
-	return {
-		'controllers': {
-			[`${featureName}_controller.ts`]: templates.controller
-		},
-		'db': {
-			[`${featureName}_db_service.ts`]: templates.dbService
-		},
-		'models': {
-			[`${featureName}_model.ts`]: templates.model,
-			[`${featureName}_schema.ts`]: templates.schema
-		},
-		'routes': {
-			[`${featureName}_routes.ts`]: templates.routes
-		},
-		'services': {
-			[`${featureName}_service.ts`]: templates.service
-		}
-	};
+function getFeatureStructure(featureName) {
+    const templates = getFeatureTemplates(featureName);
+    return {
+        'controllers': {
+            [`${featureName}_controller.ts`]: templates.controller
+        },
+        'db': {
+            [`${featureName}_db_service.ts`]: templates.dbService
+        },
+        'models': {
+            [`${featureName}_model.ts`]: templates.model,
+            [`${featureName}_schema.ts`]: templates.schema
+        },
+        'routes': {
+            [`${featureName}_routes.ts`]: templates.routes
+        },
+        'services': {
+            [`${featureName}_service.ts`]: templates.service
+        }
+    };
 }
-
-function getErrorMiddlewareContent(): string {
-	return `
+function getErrorMiddlewareContent() {
+    return `
 import { Context, isHttpError, Status } from "../deps.ts";
 
 export async function errorMiddleware(ctx: Context, next: () => Promise<unknown>) {
@@ -126,9 +143,8 @@ export async function errorMiddleware(ctx: Context, next: () => Promise<unknown>
     }
 }`;
 }
-
-function getAuthMiddlewareContent(): string {
-	return `
+function getAuthMiddlewareContent() {
+    return `
 import { Context, Status } from "../deps.ts";
 import { verifyJwt } from "../utils/jwt.ts";
 
@@ -158,9 +174,8 @@ export async function authMiddleware(ctx: Context, next: () => Promise<unknown>)
     }
 }`;
 }
-
-function getLoggerMiddlewareContent(): string {
-	return `
+function getLoggerMiddlewareContent() {
+    return `
 import { Context } from "../deps.ts";
 
 export async function loggerMiddleware(ctx: Context, next: () => Promise<unknown>) {
@@ -170,9 +185,8 @@ export async function loggerMiddleware(ctx: Context, next: () => Promise<unknown
     console.log(\`\${ctx.request.method} \${ctx.request.url} - \${ms}ms\`);
 }`;
 }
-
-function getDatabaseConfigContent(): string {
-	return `
+function getDatabaseConfigContent() {
+    return `
 import { Client } from "../deps.ts";
 import { config } from "./config.ts";
 
@@ -184,10 +198,9 @@ export const db = await new Client().connect({
     port: config.DB_PORT,
 });`;
 }
-
 // Contenido de archivos base
-function getDepsFileContent(): string {
-	return `
+function getDepsFileContent() {
+    return `
 // Oak framework
 export {
 	Application,
@@ -218,9 +231,8 @@ export * as bcrypt from "https://deno.land/x/bcrypt@v0.4.1/mod.ts";
 export * as jwt from "https://deno.land/x/djwt@v2.9.1/mod.ts";
 `;
 }
-
-function getDenoConfigContent(): string {
-	return `{
+function getDenoConfigContent() {
+    return `{
   "tasks": {
     "dev": "deno run --allow-net --allow-read --allow-env --watch main.ts",
     "start": "deno run --allow-net --allow-read --allow-env main.ts"
@@ -231,9 +243,8 @@ function getDenoConfigContent(): string {
   }
 }`;
 }
-
-function getEnvFileContent(): string {
-	return `# Server Configuration
+function getEnvFileContent() {
+    return `# Server Configuration
 PORT=8000
 ENV=development
 
@@ -248,12 +259,10 @@ DB_PORT=3306
 JWT_SECRET=your-secret-key
 JWT_EXPIRES_IN=24h`;
 }
-
-function getFeatureTemplates(featureName: string) {
-	const capitalizedName = featureName.charAt(0).toUpperCase() + featureName.slice(1);
-
-	return {
-		controller: `
+function getFeatureTemplates(featureName) {
+    const capitalizedName = featureName.charAt(0).toUpperCase() + featureName.slice(1);
+    return {
+        controller: `
 import { Context, Status } from "../../../deps.ts";
 import { ${capitalizedName}Service } from "../services/${featureName}_service.ts";
 import { I${capitalizedName} } from "../models/${featureName}_model.ts";
@@ -304,8 +313,7 @@ export class ${capitalizedName}Controller {
 		}
 	};
 }`,
-
-		model: `
+        model: `
 export interface I${capitalizedName} {
 	id?: number;
 	createdAt?: Date;
@@ -315,8 +323,7 @@ export interface I${capitalizedName} {
 
 export interface I${capitalizedName}Create extends Omit<I${capitalizedName}, 'id' | 'createdAt' | 'updatedAt'> {}
 export interface I${capitalizedName}Update extends Partial<I${capitalizedName}Create> {}`,
-
-		schema: `
+        schema: `
 import { validate, required, isString, isNumber } from "../../../deps.ts";
 
 export const ${featureName}Schema = {
@@ -331,8 +338,7 @@ export const create${capitalizedName}Schema = {
 export const update${capitalizedName}Schema = {
 	// Añade aquí las validaciones para la actualización
 };`,
-
-		dbService: `
+        dbService: `
 import { Client } from "../../../deps.ts";
 import { db } from "../../../settings/database.ts";
 import { I${capitalizedName}, I${capitalizedName}Create, I${capitalizedName}Update } from "../models/${featureName}_model.ts";
@@ -377,8 +383,7 @@ export class ${capitalizedName}DbService {
 		return result.affectedRows > 0;
 	}
 }`,
-
-		service: `
+        service: `
 import { ${capitalizedName}DbService } from "../db/${featureName}_db_service.ts";
 import { I${capitalizedName}, I${capitalizedName}Create, I${capitalizedName}Update } from "../models/${featureName}_model.ts";
 
@@ -409,8 +414,7 @@ export class ${capitalizedName}Service {
 		return await this.dbService.delete(id);
 	}
 }`,
-
-		routes: `
+        routes: `
 import { Router } from "../../../deps.ts";
 import { ${capitalizedName}Controller } from "../controllers/${featureName}_controller.ts";
 
@@ -423,11 +427,10 @@ router
 	.post("/", controller.create);
 
 export { router as ${featureName}Router };`
-	};
+    };
 }
-
-function getMainFileContent(): string {
-	return `
+function getMainFileContent() {
+    return `
 import { Application } from "./deps.ts";
 import { config } from "./settings/config.ts";
 import { errorMiddleware } from "./middlewares/error.middleware.ts";
@@ -457,9 +460,8 @@ console.log(\`🚀 Servidor corriendo en http://localhost:\${config.PORT}\`);
 await app.listen({ port: Number(config.PORT) });
 `;
 }
-
-function getConfigFileContent(): string {
-	return `
+function getConfigFileContent() {
+    return `
 import { dotenvConfig } from "../deps.ts";
 
 await dotenvConfig({ export: true });
@@ -496,5 +498,6 @@ for (const envVar of requiredEnvVars) {
 console.log("✅ Configuración cargada correctamente");
 `;
 }
-
-export function deactivate() { }
+function deactivate() { }
+exports.deactivate = deactivate;
+//# sourceMappingURL=extension.js.map
